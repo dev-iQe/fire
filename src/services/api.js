@@ -7,49 +7,52 @@ const api = axios.create({
   baseURL: BASE_URL,
   params: {
     api_key: API_KEY,
-    language: 'en-US',
   },
 });
 
-export const fetchTrendingMovies = async () => {
+// category: 'popular' | 'top_rated' | 'now_playing' | 'upcoming'
+export const fetchMovies = async (category = 'popular', language = 'en-US') => {
   try {
-    const response = await api.get('/trending/movie/day');
-    return response.data.results;
+    const response = await api.get(`/movie/${category}`, { params: { language } });
+    return response.data.results || [];
   } catch (error) {
-    console.error('Error fetching trending movies:', error);
-    return [];
+    console.error('Error fetching movies:', error?.message || error);
+    throw error;
   }
 };
 
-export const fetchLatestMovies = async () => {
+export const fetchTrendingMovies = async (language = 'en-US') => {
   try {
-    const response = await api.get('/movie/now_playing');
-    return response.data.results;
+    const response = await api.get('/trending/movie/day', { params: { language } });
+    return response.data.results || [];
   } catch (error) {
-    console.error('Error fetching latest movies:', error);
-    return [];
+    console.error('Error fetching trending movies:', error?.message || error);
+    throw error;
   }
 };
 
-export const fetchUpcomingMovies = async () => {
+export const fetchLatestMovies = (language) => fetchMovies('now_playing', language);
+export const fetchUpcomingMovies = (language) => fetchMovies('upcoming', language);
+
+export const searchMovies = async (query, language = 'en-US') => {
   try {
-    const response = await api.get('/movie/upcoming');
-    return response.data.results;
+    const response = await api.get('/search/movie', { params: { query, language } });
+    return response.data.results || [];
   } catch (error) {
-    console.error('Error fetching upcoming movies:', error);
-    return [];
+    console.error('Error searching movies:', error?.message || error);
+    throw error;
   }
 };
 
-export const searchMovies = async (query) => {
+export const fetchMovieDetails = async (id, language = 'en-US') => {
   try {
-    const response = await api.get('/search/movie', {
-      params: { query },
+    const response = await api.get(`/movie/${id}`, {
+      params: { append_to_response: 'videos,credits', language },
     });
-    return response.data.results;
+    return response.data;
   } catch (error) {
-    console.error('Error searching movies:', error);
-    return [];
+    console.error('Error fetching movie details:', error?.message || error);
+    throw error;
   }
 };
 
