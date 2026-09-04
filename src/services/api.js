@@ -1,66 +1,56 @@
-// src/services/api.js
-const BASE_URL = 'https://api.themoviedb.org/3';
-const API_KEY = '12bae60f08973cb30c741d0844769d9d';
-const ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMmJhZTYwZjA4OTczYzMzMGM3NDFkMDg0NDc2OWQ5ZCIsInN1YiI6IjY0ODQwNDc2NDczNzkwNDMyMTQzMzE0NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bh8FqG_ufZdtJPH6SqSFvzPBn9HFyzzgF-Mn7xrOT68';
+import axios from 'axios';
 
-export const fetchMovies = async (category = 'popular', language = 'ar') => {
+const API_KEY = '12bae60f08973b30c741d0844769d9d';
+const BASE_URL = 'https://api.themoviedb.org/3';
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  params: {
+    api_key: API_KEY,
+    language: 'en-US',
+  },
+});
+
+export const fetchTrendingMovies = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/movie/${category}?language=${language}`, {
-      headers: {
-        'Authorization': `Bearer ${ACCESS_TOKEN}`,
-        'accept': 'application/json'
-      }
-    });
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('TMDB error', response.status, errText);
-      throw new Error(`TMDB ${response.status}: ${errText}`);
-    }
-    const data = await response.json();
-    return data.results || [];
+    const response = await api.get('/trending/movie/day');
+    return response.data.results;
   } catch (error) {
-    console.error('Error fetching movies:', error);
-    throw error;
+    console.error('Error fetching trending movies:', error);
+    return [];
   }
 };
 
-export const searchMovies = async (query, language = 'ar') => {
+export const fetchLatestMovies = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/search/movie?query=${encodeURIComponent(query)}&language=${language}`, {
-      headers: {
-        'Authorization': `Bearer ${ACCESS_TOKEN}`,
-        'accept': 'application/json'
-      }
+    const response = await api.get('/movie/now_playing');
+    return response.data.results;
+  } catch (error) {
+    console.error('Error fetching latest movies:', error);
+    return [];
+  }
+};
+
+export const fetchUpcomingMovies = async () => {
+  try {
+    const response = await api.get('/movie/upcoming');
+    return response.data.results;
+  } catch (error) {
+    console.error('Error fetching upcoming movies:', error);
+    return [];
+  }
+};
+
+export const searchMovies = async (query) => {
+  try {
+    const response = await api.get('/search/movie', {
+      params: { query },
     });
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('TMDB error', response.status, errText);
-      throw new Error(`TMDB ${response.status}: ${errText}`);
-    }
-    const data = await response.json();
-    return data.results || [];
+    return response.data.results;
   } catch (error) {
     console.error('Error searching movies:', error);
-    throw error;
+    return [];
   }
 };
 
-export const fetchMovieDetails = async (id, language = 'ar') => {
-  try {
-    const response = await fetch(`${BASE_URL}/movie/${id}?append_to_response=videos,credits,seasons&language=${language}`, {
-      headers: {
-        'Authorization': `Bearer ${ACCESS_TOKEN}`,
-        'accept': 'application/json'
-      }
-    });
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('TMDB error', response.status, errText);
-      throw new Error(`TMDB ${response.status}: ${errText}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching movie details:', error);
-    throw error;
-  }
-};
+export default api;
