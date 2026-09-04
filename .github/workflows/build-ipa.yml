@@ -33,7 +33,12 @@ jobs:
         run: |
           cd ios
           pod install
-          xcodebuild -workspace FireTV.xcworkspace -scheme FireTV -configuration Release -sdk iphoneos -derivedDataPath build -allowProvisioningUpdates OTHER_LDFLAGS="-all_load"
+          xcodebuild -workspace FireTV.xcworkspace -scheme FireTV -configuration Release -sdk iphoneos -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            OTHER_LDFLAGS="-all_load"
 
       - name: Package IPA for eSign
         run: |
