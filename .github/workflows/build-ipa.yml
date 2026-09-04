@@ -38,7 +38,7 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             AD_HOC_CODE_SIGNING_ALLOWED=YES \
-            OTHER_LDFLAGS="-all_load"
+            'OTHER_LDFLAGS=$(inherited) -all_load'
 
       - name: Package IPA for eSign
         run: |
