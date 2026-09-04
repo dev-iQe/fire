@@ -1,10 +1,15 @@
 // index.js - نقطة الدخول المخصصة
-// الهدف: تسجيل ماسك الأخطاء قبل أي كود تاني يتحمل، عشان نمسك حتى أخطاء التحميل (import errors)
+// الهدف: مهما حصل، لازم "main" تتسجل عشان التطبيق ميقفلش بصمت،
+// وأي خطأ يتعرض في شاشة بدل ما يظهر Invariant Violation عام.
 
-const { Alert } = require('react-native');
+const React = require('react');
+const { AppRegistry, View, Text, ScrollView, Alert } = require('react-native');
+
+let lastError = null;
 
 if (global.ErrorUtils) {
   global.ErrorUtils.setGlobalHandler((error, isFatal) => {
+    lastError = error;
     try {
       Alert.alert(
         isFatal ? 'خطأ فادح (Fatal)' : 'خطأ',
@@ -17,22 +22,30 @@ if (global.ErrorUtils) {
   });
 }
 
-let App;
+function CrashFallback({ message }) {
+  return React.createElement(
+    ScrollView,
+    { style: { flex: 1, backgroundColor: '#000' }, contentContainerStyle: { padding: 20, paddingTop: 60 } },
+    React.createElement(Text, { style: { color: 'red', fontSize: 16, marginBottom: 10 } }, 'حصل خطأ أثناء تحميل التطبيق:'),
+    React.createElement(Text, { style: { color: '#fff', fontSize: 12 } }, String(message))
+  );
+}
+
+let AppComponent;
 try {
-  App = require('./App').default;
+  AppComponent = require('./App').default;
 } catch (e) {
-  // لو حتى تحميل App.js نفسه فشل، هنعرض الخطأ في تطبيق بديل بسيط بدل ما يقفل بصمت
-  const React = require('react');
-  const { View, Text } = require('react-native');
-  App = function CrashFallback() {
-    return React.createElement(
-      View,
-      { style: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#000' } },
-      React.createElement(Text, { style: { color: 'red', fontSize: 14 } }, String(e?.message || e)),
-      React.createElement(Text, { style: { color: '#fff', fontSize: 10, marginTop: 10 } }, String(e?.stack || ''))
-    );
+  AppComponent = function () {
+    return React.createElement(CrashFallback, { message: (e && (e.stack || e.message)) || e });
   };
 }
 
-const { registerRootComponent } = require('expo');
-registerRootComponent(App);
+try {
+  AppRegistry.registerComponent('main', () => AppComponent);
+} catch (e) {
+  AppRegistry.registerComponent('main', () =>
+    function () {
+      return React.createElement(CrashFallback, { message: (e && (e.stack || e.message)) || e });
+    }
+  );
+}
