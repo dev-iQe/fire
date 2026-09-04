@@ -1,1 +1,48 @@
+name: Build App for eSign
 
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Prebuild iOS Local
+        run: npx expo prebuild --platform ios --clean
+
+      - name: Build with Xcode for Generic Device
+        run: |
+          cd ios
+          pod install
+          xcodebuild -workspace FireTV.xcworkspace -scheme FireTV -configuration Release -sdk iphoneos -derivedDataPath build -allowProvisioningUpdates OTHER_LDFLAGS="-all_load"
+
+      - name: Package IPA for eSign
+        run: |
+          mkdir -p Payload
+          cp -r ios/build/Build/Products/Release-iphoneos/*.app Payload/
+          zip -r FireTV-eSign.ipa Payload
+          rm -rf Payload
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FireTV-eSign
+          path: FireTV-eSign.ipa
