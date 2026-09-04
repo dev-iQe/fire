@@ -10,14 +10,14 @@ export default function SettingsScreen() {
     <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.brandHeader}>
         <View style={styles.fireLogoContainer}>
-          <FontAwesome5 name="fire" size={28} color="#ffffff" />
-          <Text style={styles.tvText}>Tv</Text>
+          <FontAwesome5 name="fire" size={28} color="#f97316" />
+          <Text style={[styles.tvText, { color: theme.colors.text }]}>Tv</Text>
         </View>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>الإعدادات (Settings)</Text>
+        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>الإعدادات</Text>
       </View>
 
       <View style={[styles.settingItem, { backgroundColor: theme.colors.card }]}>
-        <Text style={[styles.settingText, { color: theme.colors.text }]}>الوضع الليلي (Dark Mode)</Text>
+        <Text style={[styles.settingText, { color: theme.colors.text }]}>وضع الليلي / النهاري</Text>
         <Switch value={isDarkMode} onValueChange={toggleTheme} />
       </View>
 
@@ -27,14 +27,14 @@ export default function SettingsScreen() {
       </View>
 
       <View style={[styles.settingItem, { backgroundColor: theme.colors.card }]}>
-        <Text style={[styles.settingText, { color: theme.colors.text }]}>لغة التطبيق (Language)</Text>
+        <Text style={[styles.settingText, { color: theme.colors.text }]}>لغة التطبيق</Text>
         <TouchableOpacity onPress={() => changeLanguage(language === 'ar' ? 'en' : 'ar')}>
-          <Text style={{ color: '#3b82f6', fontWeight: 'bold' }}>{language === 'ar' ? 'العربية 🇸🇦' : 'English 🇺🇸'}</Text>
+          <Text style={{ color: '#3b82f6', fontWeight: 'bold' }}>{language === 'ar' ? 'العربية ' : 'English '}</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.socialContainer}>
-        <Text style={[styles.socialTitle, { color: theme.colors.text }]}>تواصل معي عبر حساباتي:</Text>
+        <Text style={[styles.socialTitle, { color: theme.colors.text }]}>Dev azawy:</Text>
         <View style={styles.socialIcons}>
           <TouchableOpacity onPress={() => Linking.openURL('https://instagram.com/eng_azawy')}>
             <Ionicons name="logo-instagram" size={32} color="#E1306C" />
@@ -57,8 +57,8 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   brandHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 30, marginTop: 40 },
-  fireLogoContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f97316', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, borderWidth: 1.5, borderColor: '#000' },
-  tvText: { color: '#fff', fontSize: 20, fontWeight: 'bold', marginLeft: 4 },
+  fireLogoContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4, paddingVertical: 4 },
+  tvText: { fontSize: 20, fontWeight: 'bold', marginLeft: 4 },
   headerTitle: { fontSize: 20, fontWeight: 'bold', marginLeft: 15 },
   settingItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderRadius: 12, marginBottom: 15 },
   settingText: { fontSize: 15 },
