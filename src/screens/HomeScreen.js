@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Activit
 import Header from '../components/Header';
 import MovieCard from '../components/MovieCard';
 import { fetchMovies } from '../services/api';
+import { useTabBarVisibility } from '../context/TabBarVisibilityContext';
 
 const CATEGORIES = ['Most Watched', 'For Kids', 'Family Fun', 'Action'];
 
@@ -13,6 +14,7 @@ export default function HomeScreen({ navigation }) {
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
+  const { handleScroll } = useTabBarVisibility();
 
   const loadData = () => {
     setLoading(true);
@@ -64,7 +66,12 @@ export default function HomeScreen({ navigation }) {
       {loading ? (
         <ActivityIndicator color="#f97316" style={{ marginTop: 40 }} size="large" />
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ paddingBottom: 110 }}
+        >
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Movies</Text>
             <FlatList
